@@ -5,7 +5,7 @@ import { FiEdit, FiTrash2 } from "react-icons/fi";
 import Modal from "./components/Modal";
 import { FormEventHandler, useState } from "react";
 
-export const Task = [
+const Task = [
   {
     id: "1",
     text: "Go to market",
@@ -34,7 +34,7 @@ export default function Home() {
   const handleSubmitEditTodo = async (e: any, id: string) => {
     e.preventDefault();
     const updatedTasks = Tasks.map((task) =>
-      task.id === id ? { ...task, text: taskToEdit || "" } : task
+      task.id === id ? { ...task, text: taskToEdit } : task
     );
     setTasks(updatedTasks);
     setOpenModalEdit(false);
