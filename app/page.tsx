@@ -1,112 +1,160 @@
-import Image from "next/image";
+"use client";
+
+import { AiOutlinePlus } from "react-icons/ai";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
+import Modal from "./components/Modal";
+import { FormEventHandler, useState } from "react";
+
+export const Task = [
+  {
+    id: "1",
+    text: "Go to market",
+  },
+];
 
 export default function Home() {
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [newTaskValue, setNewTaskValue] = useState<string>("");
+  const [openModalEdit, setOpenModalEdit] = useState<boolean>(false);
+  const [taskToEdit, setTaskToEdit] = useState<string>("");
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
+  const [Tasks, setTasks] = useState(Task);
+
+  const handleSubmitNewTodo: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+    const newTask = {
+      id: (Tasks.length + 1).toString(),
+      text: newTaskValue,
+    };
+    setTasks([...Tasks, newTask]);
+    setNewTaskValue("");
+    setModalOpen(false);
+  };
+
+  const handleSubmitEditTodo = async (e: any, id: string) => {
+    e.preventDefault();
+    const updatedTasks = Tasks.map((task) =>
+      task.id === id ? { ...task, text: taskToEdit || "" } : task
+    );
+    setTasks(updatedTasks);
+    setOpenModalEdit(false);
+  };
+
+  const handleDeleteTask = async (id: string) => {
+    setTasks(Tasks.filter((task) => task.id !== id));
+    setDeletingTaskId(null);
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="max-w-4xl mx-auto mt-4">
+      <div className="text-center my-5 flex flex-col gap-4">
+        <h1 className="text-2xl font-bold">Todo List App</h1>
+        <div>
+          <button
+            onClick={() => setModalOpen(true)}
+            className="btn btn-primary w-full"
           >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+            Add new task <AiOutlinePlus className="ml-2" size={18} />
+          </button>
+
+          <Modal modalOpen={modalOpen} setModalOpen={setModalOpen}>
+            <form onSubmit={handleSubmitNewTodo}>
+              <h3 className="font-bold text-lg">Add new task</h3>
+              <div className="modal-action">
+                <input
+                  value={newTaskValue}
+                  onChange={(e) => setNewTaskValue(e.target.value)}
+                  type="text"
+                  placeholder="Type here"
+                  className="input input-bordered w-full"
+                />
+                <button type="submit" className="btn">
+                  Submit
+                </button>
+              </div>
+            </form>
+          </Modal>
         </div>
-      </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+        <div className="overflow-x-auto">
+          <table className="table w-full">
+            <thead>
+              <tr>
+                <th>Tasks</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Tasks.length === 0 ? (
+                <tr>
+                  <td colSpan={2} className="text-center">
+                    No tasks to show
+                  </td>
+                </tr>
+              ) : (
+                Tasks.map((task) => (
+                  <tr key={task.id}>
+                    <td className="w-full">{task.text}</td>
+                    <td className="flex gap-5">
+                      <FiEdit
+                        onClick={() => {
+                          setOpenModalEdit(true);
+                          setTaskToEdit(task.text);
+                        }}
+                        cursor="pointer"
+                        className="text-blue-500"
+                        size={25}
+                      />
+                      <Modal
+                        modalOpen={openModalEdit}
+                        setModalOpen={setOpenModalEdit}
+                      >
+                        <form
+                          onSubmit={(e) => handleSubmitEditTodo(e, task.id)}
+                        >
+                          <h3 className="font-bold text-lg">Edit task</h3>
+                          <div className="modal-action">
+                            <input
+                              value={taskToEdit}
+                              onChange={(e) => setTaskToEdit(e.target.value)}
+                              type="text"
+                              placeholder="Type here"
+                              className="input input-bordered w-full"
+                            />
+                            <button type="submit" className="btn">
+                              Submit
+                            </button>
+                          </div>
+                        </form>
+                      </Modal>
+                      <FiTrash2
+                        onClick={() => setDeletingTaskId(task.id)}
+                        cursor="pointer"
+                        className="text-red-500"
+                        size={25}
+                      />
+                      <Modal
+                        modalOpen={deletingTaskId === task.id}
+                        setModalOpen={() => setDeletingTaskId(null)}
+                      >
+                        <h3 className="text-lg">
+                          Are you sure, you want to delete this task?
+                        </h3>
+                        <div className="modal-action">
+                          <button
+                            onClick={() => handleDeleteTask(task.id)}
+                            className="btn"
+                          >
+                            Yes
+                          </button>
+                        </div>
+                      </Modal>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </main>
   );
